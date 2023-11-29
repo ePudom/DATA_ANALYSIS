@@ -1,0 +1,436 @@
+---
+title: "Cyclistic Bike Trips"
+author: "Bisola Ogunye"
+date: "2023-10-05"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '../datasets')
+```
+
+## Objective
+
+The objective of this analysis is to uncover actionable insights to drive the conversion of casual riders into Cyclistic annual members by understanding the differences between annual Members and casual riders.
+
+### Questions to guide analysis
+
+* What is the significant difference between casual riders and annual members?
+* Which dock stations do most casual riders/annual members start trips from?
+* Which dock stations do most casual riders/annual members end trips at?
+* Which bike type do casual riders/annual members mostly use?
+* What is the average trip duration for casual riders/annual members?
+* What day of the week do casual riders/annual members mainly start trips?
+
+## Packages 
+
+For this project, the tidyverse packaged was installed and loaded.
+```{r load packages, message=FALSE, tidy=TRUE}
+library(tidyverse)
+library(formatR)
+library(shiny)
+```
+
+## Preparing the data
+
+All files to be used during the course of this project were obtained for the company's database where the data is stored by month. which were in turn saved in the datasets directory:
+
+*__~/data_analytics_portfolio_project/GDAC/Case_Study_1/datasets__*
+
+Then the file names were saved in the variable 'all_files'.
+
+```{r list files, warning=FALSE, tidy=TRUE}
+all_files <- list.files(pattern = "*.csv")
+all_files
+```
+
+The the content of 'all_files' were read into a single data frame.
+
+```{r map files to df, message=FALSE, warning=FALSE, results='hide', tidy=TRUE}
+all_df <- map_df(all_files, read_csv)
+```
+
+The following commands were run to get a feel of the entire data.
+
+* View structure of the data
+
+```{r structure 1, echo=FALSE, tidy=TRUE}
+str(all_df)
+```
+
+* Preview column names
+
+```{r column names, echo=FALSE, tidy=TRUE}
+colnames(all_df) 
+```
+
+* Preview the data
+
+```{r structure 2, echo=FALSE, paged.print=TRUE, tidy=TRUE}
+glimpse(all_df)
+```
+
+* First 6 rows
+```{r head, echo=FALSE, paged.print=TRUE, tidy=TRUE}
+head(all_df)
+```
+
+* Last 6 rows
+
+```{r tail, echo=FALSE, paged.print=TRUE, tidy=TRUE}
+tail(all_df)
+```
+
+
+## Processing the data
+
+The following steps were followed for this phase.
+
+* Columns necessary for the project were selected 
+* Rename columns for easy readability
+* Remove NAs 
+* Add columns for 
+  + 'trip_duration' (length of bike ride)
+  + 'day_of_week' (weekday the ride started)
+
+```{r cleaning 1, tidy=TRUE}
+clean_df <- all_df %>%
+  select("ride_id", "rideable_type", "started_at", "ended_at", "start_station_name", 
+         "start_station_id", "end_station_name", "end_station_id", "member_casual") %>%
+  rename(trip_id = ride_id,
+         bike_type = rideable_type, 
+         start_time = started_at,
+         end_time = ended_at,
+         from_station_name = start_station_name,
+         to_station_name = end_station_name,
+         from_station_id = start_station_id,
+         to_station_id = end_station_id,
+         usertype = member_casual) %>%
+  na.omit() %>%
+  mutate(trip_duration = as.numeric(difftime(end_time, start_time, units = "mins")), 
+         day_of_week = wday(start_time, label = TRUE, abbr = FALSE))
+```
+
+```{r structure 4, echo=FALSE, paged.print=TRUE, tidy=TRUE}
+glimpse(clean_df)
+```
+
+After a review of the minimum and maximum 'trip_duration', we can see that some rides have negative duration and some rides were for more than a day (the highest 'trip_duration' being  almost 23 days). 
+
+```{r min & max, paged.print=TRUE, tidy=TRUE}
+min(clean_df$trip_duration) # -168.7
+max(clean_df$trip_duration) # 34354.07 approx. 23 days
+```
+
+However, for this analysis, these groups qualify as bad data and are removed.
+
+```{r cleaning 2, tidy=TRUE}
+clean_df <- filter(clean_df, trip_duration >= 1, trip_duration <= (24*60))
+```
+
+```{r structure 5, echo=FALSE, paged.print=TRUE, tidy=TRUE}
+glimpse(clean_df)
+```
+
+Then, we verify that all NAs have been removed and that the data has no duplicates.
+
+```{r check data, message=FALSE, paged.print=TRUE, tidy=TRUE}
+anyNA(clean_df) #FALSE
+
+colSums(is.na(clean_df))
+
+sum(duplicated(clean_df$trip_id)) # 0
+```
+
+## Analyze
+
+In this phase, we will be performing Descriptive analysis to help us understand what is going on in the data.
+
+```{r tidy=TRUE, echo=FALSE}
+# Function to calculate mode of a vector
+getMode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+We create summary tables to give the whole picture of the data.
+
+#### Get general summary of the trip duration
+
+```{r df summary, echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE, tidy=TRUE}
+summary(clean_df$trip_duration)
+```
+
+#### The average ride time by each day for members vs casual users
+
+```{r tidy=TRUE, echo=FALSE}
+aggregate(clean_df$trip_duration ~ clean_df$usertype + clean_df$day_of_week, FUN = mean)
+```
+
+#### Generate data frames
+
+##### Summarize table grouping on the user type**
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, tidy=TRUE}
+data_summary <- clean_df %>%
+  group_by(usertype) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2),
+    avg_trip_duration = mean(trip_duration),
+    max_trip_duration = max(trip_duration),
+    min_trip_duration = min(trip_duration),
+    mode_bike_type = getMode(bike_type),
+    mode_day_of_week = getMode(day_of_week)
+  )
+
+as_tibble(data_summary)
+```
+
+**POINTS TO NOTE**
+
+* There are more member users than casual.
+
+```{r tidy=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = data_summary, aes(x = "", y = row_count, fill = usertype)) +
+  geom_bar(stat = "identity", width = 1, color = "white") + 
+  coord_polar("y", start = 0) + 
+  theme_void() +
+  theme(legend.position = "right") +
+  geom_text(aes(label = paste(percentage, "%")), 
+            color = "white", 
+            size = 6, 
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+* The average trip duration for casual users is more than members.
+* Both user type use classic bikes.
+
+##### How long do both user types commute for each day of the week?
+
+```{r tidy=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+summary_by_weekday <- clean_df %>%
+  group_by(usertype, day_of_week) %>%
+    summarise(
+      row_count = n(),
+      percentage = round((n()/nrow(clean_df)) * 100, digits = 2),
+      avg_trip_duration = mean(trip_duration),
+      max_trip_duration = max(trip_duration),
+      min_trip_duration = min(trip_duration),
+      mode_bike_type = getMode(bike_type)
+    ) %>%
+  arrange(usertype, day_of_week)
+
+as_tibble(summary_by_weekday)
+```
+
+**POINTS TO NOTE**
+
+* Members tend to bike more during weekdays while casual users tend to bike more during weekends.
+* Casual riders mostly ride on Saturdays while members mostly ride on Thursdays.
+
+```{r tidy=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = summary_by_weekday, aes(x = day_of_week, y = row_count, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_fill_brewer(palette = "Set1")
+```
+
+* Both user types tend to ride longer on weekends.
+
+```{r tidy=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = summary_by_weekday, aes(x = day_of_week, y = avg_trip_duration, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_fill_brewer(palette = "Set1")
+```
+
+##### Which bike types do users mostly and which day of the week is common to the bike types?
+
+We would be getting more information on what bike type both user types make use of.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+summary_by_bike_type <- clean_df %>%
+  group_by(usertype, bike_type, day_of_week) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2),
+    avg_trip_duration = mean(trip_duration),
+    max_trip_duration = max(trip_duration),
+    min_trip_duration = min(trip_duration),
+    mode_day_of_week = getMode(day_of_week)
+  ) %>%
+  arrange(usertype)
+
+summary_by_bike_type
+```
+
+**POINTS TO NOTE**
+
+* Only casual users make use of docked bikes.
+* Both user types tend to spend lesser time using electric bikes.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = summary_by_bike_type, aes(x = bike_type, y = row_count, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+* Members mostly use classic bikes during weekdays while casual users mostly use classic bikes during weekends.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = summary_by_bike_type, aes(x = bike_type, y = row_count, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_grid(~day_of_week) +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+summary_by_bike_type %>% 
+  filter(bike_type != 'docked_bike') %>%
+ggplot(aes(x = bike_type, y = avg_trip_duration, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_grid(~day_of_week) +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+We go further to analyze by average trips per quarter and month.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+total_year_count <- clean_df %>%
+  group_by(year = year(start_time), 
+           # mnth_n = month(start_time),
+           mnth = months(start_time, abbr = TRUE),
+           qtr = quarters(start_time), 
+           usertype) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2),
+    avg_trip_duration = mean(trip_duration),
+    mode_day_of_week = getMode(day_of_week),
+    mode_bike_type = getMode(bike_type)
+  ) %>%
+  arrange(year, qtr)
+
+
+total_year_count
+```
+
+##### Which user type use bikes more per quarter?
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = total_year_count, aes(x = qtr, y = row_count, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~year)
+```
+
+**POINTS TO NOTE**
+
+* There were more casual riders in 2022 than 2023 (the first 3 quarters)
+* Peak rides for casual riders is in June, while that of members is in July
+
+##### Which user type use bikes more per month?
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = total_year_count, aes(x = mnth, y = row_count, fill = usertype)) +
+  geom_col(position = "dodge", aes(
+    x = factor(total_year_count$mnth, levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
+    ))+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_grid(~year) +
+  theme(axis.text.x = element_text(angle = 45)) 
+```
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = total_year_count, aes(x = qtr, y = avg_trip_duration, fill = usertype)) +
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Average Trip Duration per Quarter",
+      x = "Quarter",
+      y = "Average Trip Duration") +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~year)
+```
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = total_year_count, aes(x = mnth, y = avg_trip_duration, fill = usertype)) +
+  geom_col(position = "dodge", aes(
+    x = factor(total_year_count$mnth, levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
+    ))+
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Average Trip Duration per Month",
+      x = "Month",
+      y = "Average Trip Duration") +
+  facet_grid(~year) +
+  theme(axis.text.x = element_text(angle = 45)) 
+```
+
+##### What are the top 5 stations to start and end trips?
+
+* Top 10 start stations used by casual users.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+top_5_start_stations_casual <- filter(clean_df, usertype == 'casual') %>%
+  group_by(from_station_name) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2),percentage = (n()/nrow(clean_df)) * 100
+  ) %>%
+    arrange(-row_count) %>%
+    head(10)
+
+top_5_start_stations_casual
+```
+
+* Top 10 start stations used by members.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+top_5_start_stations_member <- filter(clean_df, usertype == 'member') %>%
+  group_by(from_station_name) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2)
+  ) %>%
+    arrange(-row_count) %>%
+    head(5)
+
+top_5_start_stations_member
+```
+
+* Top 10 end stations used by casual users.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+top_5_end_stations_casual <- filter(clean_df, usertype == 'casual') %>%
+  group_by(usertype, to_station_name) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2)
+  ) %>%
+    arrange(-row_count) %>%
+    head(10)
+
+top_5_end_stations_casual
+```
+
+* Top 10 end stations used by members.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+top_5_end_stations_member <- filter(clean_df, usertype == 'member') %>%
+  group_by(usertype, to_station_name) %>%
+  summarise(
+    row_count = n(),
+    percentage = round((n()/nrow(clean_df)) * 100, digits = 2)
+  ) %>%
+    arrange(-row_count) %>%
+    head(10)
+
+top_5_end_stations_member
+```

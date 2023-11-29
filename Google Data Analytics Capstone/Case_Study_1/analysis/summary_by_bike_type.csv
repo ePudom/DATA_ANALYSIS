@@ -1,0 +1,6 @@
+"","usertype","bike_type","row_count","avg_trip_duration","max_trip_duration","min_trip_duration","mode_day_of_week"
+"1","casual","classic_bike",1317395,25.203664365408,1438.58333333333,1,"Saturday"
+"2","casual","docked_bike",233358,49.5671521153478,1439.36666666667,1,"Saturday"
+"3","casual","electric_bike",1025924,16.4690697848963,479.983333333333,1,"Saturday"
+"4","member","classic_bike",2619302,13.3616265198387,1436.33333333333,1,"Tuesday"
+"5","member","electric_bike",1436899,11.1108847014764,480,1,"Thursday"
