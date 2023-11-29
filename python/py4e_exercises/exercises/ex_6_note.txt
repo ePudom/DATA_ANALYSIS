@@ -1,0 +1,33 @@
+STRING MANIPULATION
+
+- Iteration: using
+
+    - for loop(determinate iteration) e.g. 
+    ////
+    word = 'banana'
+
+    for letter in word:
+        print(letter)
+    ////
+
+    - while loop (with increment of iteration variable) e.g.
+    ///
+    word = 'banana'
+    index = 0
+
+    while index < len(word):
+        letter = word[index]
+        index = index + 1
+        print(letter)
+    ///
+
+- Slicing: syntax
+    string[start:end-1]
+    e.g.
+    ///
+    word = 'banana'
+
+    slice1 = word[0:3] # Output: ban
+    slice2 = word[4:7] # Output: na
+    slice3 = word[:6]  # Output: banana
+    slice4 = word[2:]  # Output: nana

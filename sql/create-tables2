@@ -1,0 +1,54 @@
+-- IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[world].[location_category]') AND type in (N'U'))
+-- DROP TABLE [world].[location_category]
+-- GO
+
+alter table world.countries 
+-- alter column id nvarchar(50) not null
+-- drop constraint PK__countries
+-- add primary key (id) 
+add foreign key (continent_id) references world.category(id)
+
+
+
+
+update world.countries
+set id = concat('C00', id)
+-- set id = concat('C00', substring(id, 7, len(id)))
+
+select substring(id, 7, len(id)) as temp from world.countries
+
+
+selec
+
+select * from world.countries
+where id = '2'
+order by id
+
+
+select * from world.covid_vaccinations_country
+
+alter table world.gdp
+add foreign key (country_id) references world.countries(id)
+-- add primary key (id) 
+
+-- alter table world.covid_deaths_country
+-- add foreign key (country_id) references world.countries(id)
+-- add primary key (id) 
+
+
+alter table world.covid_vaccinations_world
+add foreign key (category_id) references world.category(id);
+-- add primary key (id) ;
+
+alter table world.covid_deaths_world
+add foreign key (category_id) references world.category(id);
+-- add primary key (id) ;
+
+alter table world.gdp
+add foreign key (country_id) references world.countries(id);
+
+select substring(,country_id) from world.gdp
+order by country_id;
+
+select id from world.countries
+order by id
