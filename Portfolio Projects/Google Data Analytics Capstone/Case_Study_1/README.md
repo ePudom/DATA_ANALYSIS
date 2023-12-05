@@ -19,5 +19,5 @@ The methodology includes data collection, preparation, segmentation, and usage p
 The insights gained will be used to create targeted marketing initiatives and incentives to encourage casual riders to upgrade to annual memberships.
 ### Other Resources
 * <a href="https://docs.google.com/document/d/1n2W-mk2_vhn_ci0I086St27Fl0-lYQ-l_pgh7ukG9eM/edit?usp=sharing" target=”_blank”>Detailed Report</a>
-* <a href="https://www.kaggle.com/code/bisolaogunye/bellabeat-smart-device-usage" target=”_blank”>Analysis</a>
-* <a href="https://public.tableau.com/views/BellabeatDashboard_16984220439700/BellabeatUserSmartWatchAnalysisDashboard?:language=en-US&:display_count=n&:origin=viz_share_link" target=”_blank”>Data Visualization</a>
+* <a href="https://www.kaggle.com/code/bisolaogunye/cyclistic-bike-sharing-analysis" target=”_blank”>Analysis</a>
+* <a href="https://public.tableau.com/views/CyclisticDashboard2_16964892086230/MainDashboard?:language=en-US&:display_count=n&:origin=viz_share_link" target=”_blank”>Data Visualization</a>
