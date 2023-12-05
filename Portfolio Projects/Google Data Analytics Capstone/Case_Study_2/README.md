@@ -1,6 +1,6 @@
 TL;DR
 
-<img src="https://github.com/user/repo/blob/main/fitness.avif" align="center" height="350" width="600"/>
+<img src="https://github.com/user/repo/blob/main/fitness.jpg" align="center" height="350" width="600"/>
 
 
 ## BELLABEAT
@@ -22,4 +22,4 @@ The results will be presented in a comprehensive report that will detail the dis
 ### Other Resources
 * <a href="https://docs.google.com/document/d/1pprCcYPz2k9raI7Tr77yckQAm5UIjkQsJn0iGUU9BCA/edit?usp=sharing" target=”_blank”>Detailed Report</a>
 * <a href="https://www.kaggle.com/code/bisolaogunye/bellabeat-smart-device-usage" target=”_blank”>Analysis</a>
-* <a href="[https://public.tableau.com/views/BellabeatDashboard_16984220439700/BellabeatUserSmartWatchAnalysisDashboard?:language=en-US&:display_count=n&:origin=viz_share_link](https://public.tableau.com/views/BellabeatDashboard_16984220439700/BellabeatUserSmartWatchAnalysisDashboard?:language=en-US&:display_count=n&:origin=viz_share_link)https://public.tableau.com/views/BellabeatDashboard_16984220439700/BellabeatUserSmartWatchAnalysisDashboard?:language=en-US&:display_count=n&:origin=viz_share_link" target=”_blank”>Data Visualization</a>
+* <a href="https://public.tableau.com/views/BellabeatDashboard_16984220439700/BellabeatUserSmartWatchAnalysisDashboard?:language=en-US&:display_count=n&:origin=viz_share_link" target=”_blank”>Data Visualization</a>
