@@ -1,6 +1,6 @@
 TL;DR
 
-<img src="../../../fitness.jpg" align="center" height="350" width="600"/>
+<img src="../../../assets/fitness.avif" align="center" height="350" width="600"/>
 
 
 ## BELLABEAT
