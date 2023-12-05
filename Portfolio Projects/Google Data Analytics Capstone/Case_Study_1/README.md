@@ -1,8 +1,8 @@
 TL;DR
 
-## CYCLISTIC BIKE_SHARE
-
 <img src="../../../assets/cyclistic.png" align="center" height="200" width="200"/>
+
+## CYCLISTIC BIKE_SHARE
 
 ### Business Question
 How does a bike-share navigate speedy success? 
