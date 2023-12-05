@@ -1,6 +1,6 @@
 TL;DR
 
-<img src="https://github.com/user/repo/blob/main/fitness.jpg" align="center" height="350" width="600"/>
+<img src="../../../fitness.avif" align="center" height="350" width="600"/>
 
 
 ## BELLABEAT
