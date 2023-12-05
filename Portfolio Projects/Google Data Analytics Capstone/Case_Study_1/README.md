@@ -2,7 +2,7 @@ TL;DR
 
 ## CYCLISTIC BIKE_SHARE
 
-<img src="../../../assets/cyclistic.png" align="center" height="350" width="600"/>
+<img src="../../../assets/cyclistic.png" align="center" height="200" width="200"/>
 
 ### Business Question
 How does a bike-share navigate speedy success? 
