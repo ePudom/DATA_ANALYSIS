@@ -2,7 +2,7 @@ TL;DR
 
 ## CYCLISTIC BIKE_SHARE
 
-[IMAGE_DESCRIPTION](../../../assets/bike-sharing.jpg)
+[IMAGE_DESCRIPTION](../../../)
 
 ### Business Question
 How does a bike-share navigate speedy success? 
