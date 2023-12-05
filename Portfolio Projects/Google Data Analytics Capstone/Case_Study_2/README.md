@@ -1,5 +1,7 @@
 TL;DR
 
+[IMAGE_DESCRIPTION](../../../assets/fitness.avif)
+
 ## BELLABEAT
 
 ### Business Question
